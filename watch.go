@@ -4,6 +4,7 @@ import (
 	"github.com/howeyc/fsnotify"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type RecursiveWatcher struct {
@@ -26,6 +27,9 @@ func NewRecursiveWatcher(path string) (watcher RecursiveWatcher, err error) {
 func (watcher RecursiveWatcher) WatchRecursive(path string) (err error) {
 	err = watcher.Watch(path)
 	filepath.Walk(path, func(path string, info os.FileInfo, e error) error {
+		if strings.HasPrefix(path, ".") {
+			return nil
+		}
 		if info.IsDir() {
 			err = watcher.Watch(path)
 		}
