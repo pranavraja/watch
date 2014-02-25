@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -13,8 +13,9 @@ func taskRunner(work chan string) {
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v", err)
+			log.Println(err)
 		}
+		println("----")
 	}
 }
 
@@ -32,7 +33,7 @@ func main() {
 	for {
 		_, err := watcher.Next()
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v", err)
+			log.Println(err)
 		}
 		select {
 		case work <- os.Args[2]:
