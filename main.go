@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func taskRunner(work chan string) {
@@ -18,12 +20,20 @@ func taskRunner(work chan string) {
 	}
 }
 
+func ignoreRules() rules {
+	contents, err := ioutil.ReadFile(".gitignore")
+	if err != nil {
+		return nil
+	}
+	return rules(strings.Split(string(contents), "\n"))
+}
+
 func main() {
-	if len(os.Args) <= 2 {
-		println("Usage: watch <directory> <cmd>")
+	if len(os.Args) <= 1 {
+		println("Usage: watch <cmd>")
 		os.Exit(1)
 	}
-	watcher, err := NewRecursiveWatcher(os.Args[1])
+	watcher, err := NewRecursiveWatcher(".", ignoreRules())
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +45,7 @@ func main() {
 			log.Println(err)
 		}
 		select {
-		case work <- os.Args[2]:
+		case work <- os.Args[1]:
 		default:
 		}
 	}

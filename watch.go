@@ -1,22 +1,36 @@
 package main
 
 import (
-	"github.com/howeyc/fsnotify"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/howeyc/fsnotify"
 )
+
+type rules []string
+
+func (r rules) Match(filename string) bool {
+	for _, rule := range r {
+		if matched, _ := path.Match(rule, `/`+filename); matched {
+			return true
+		}
+	}
+	return false
+}
 
 type RecursiveWatcher struct {
 	*fsnotify.Watcher
+	ignore rules
 }
 
-func NewRecursiveWatcher(path string) (watcher RecursiveWatcher, err error) {
+func NewRecursiveWatcher(path string, ignore rules) (watcher RecursiveWatcher, err error) {
 	w, err := fsnotify.NewWatcher()
 	if err != nil {
 		return
 	}
-	watcher = RecursiveWatcher{w}
+	watcher = RecursiveWatcher{w, ignore}
 	err = watcher.WatchRecursive(path)
 	if err != nil {
 		return
@@ -24,11 +38,14 @@ func NewRecursiveWatcher(path string) (watcher RecursiveWatcher, err error) {
 	return watcher, nil
 }
 
-func (watcher RecursiveWatcher) WatchRecursive(path string) (err error) {
-	err = watcher.Watch(path)
-	filepath.Walk(path, func(path string, info os.FileInfo, e error) error {
+func (watcher RecursiveWatcher) WatchRecursive(base string) (err error) {
+	err = watcher.Watch(base)
+	filepath.Walk(base, func(path string, info os.FileInfo, e error) error {
 		if strings.HasPrefix(path, ".") {
 			return nil
+		}
+		if watcher.ignore.Match(path) {
+			return filepath.SkipDir
 		}
 		if info.IsDir() {
 			err = watcher.Watch(path)
@@ -42,7 +59,7 @@ func (watcher RecursiveWatcher) Handle(ev *fsnotify.FileEvent) {
 	if ev.IsCreate() {
 		info, err := os.Stat(ev.Name)
 		if err == nil {
-			if info.IsDir() {
+			if info.IsDir() && !watcher.ignore.Match(ev.Name) {
 				watcher.WatchRecursive(ev.Name)
 			}
 		}

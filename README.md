@@ -1,9 +1,11 @@
 
-Watch a directory, run a command.
+Watch the current directory, run a command.
 
     go get github.com/pranavraja/watch
 
 Doesn't re-run the command if already running.
+
+Processes simple .gitignore rules, but nothing too fancy
 
 # Prerequisites
 
@@ -15,9 +17,9 @@ Doesn't re-run the command if already running.
 
 # Running
 
-    watch <directory> <cmd>
+    watch <cmd>
 
 e.g.
 
-    watch src make
+    watch make
 
