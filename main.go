@@ -15,7 +15,6 @@ func taskRunner(work chan string) {
 		if err != nil {
 			log.Println(err)
 		}
-		println("----")
 	}
 }
 
