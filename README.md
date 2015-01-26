@@ -15,9 +15,9 @@ Doesn't re-run the command if already running.
 
 # Running
 
-    ./watch <directory> <cmd>
+    watch <directory> <cmd>
 
 e.g.
 
-    ./watch src make
+    watch src make
 
