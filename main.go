@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -11,12 +13,14 @@ import (
 func taskRunner(work chan string) {
 	for {
 		cmd := exec.Command("/bin/sh", "-c", <-work)
-		cmd.Stdout = os.Stdout
+		buf := new(bytes.Buffer)
+		cmd.Stdout = buf
 		cmd.Stderr = os.Stderr
 		err := cmd.Run()
 		if err != nil {
 			log.Println(err)
 		}
+		fmt.Print(buf.String())
 	}
 }
 
