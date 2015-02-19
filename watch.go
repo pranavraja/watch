@@ -71,6 +71,9 @@ func (watcher RecursiveWatcher) Handle(ev *fsnotify.FileEvent) {
 func (watcher RecursiveWatcher) Next() (*fsnotify.FileEvent, error) {
 	select {
 	case event := <-watcher.Event:
+		if strings.HasPrefix(event.Name, ".") || watcher.ignore.Match(event.Name) {
+			return watcher.Next()
+		}
 		watcher.Handle(event)
 		return event, nil
 	case err := <-watcher.Error:
