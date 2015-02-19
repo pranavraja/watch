@@ -39,6 +39,7 @@ func NewRecursiveWatcher(path string, ignore rules) (watcher RecursiveWatcher, e
 }
 
 func (watcher RecursiveWatcher) WatchRecursive(base string) (err error) {
+	err = watcher.Watch(base)
 	filepath.Walk(base, func(path string, info os.FileInfo, e error) error {
 		if strings.HasPrefix(path, ".") {
 			return nil
