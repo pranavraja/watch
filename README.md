@@ -1,4 +1,7 @@
 
+Hey don't use this, it doesn't scale.
+[fswatch](https://github.com/emcrisostomo/fswatch) is way better.
+
 Watch the current directory, run a command.
 
     go get github.com/pranavraja/watch
